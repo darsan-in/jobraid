@@ -1,0 +1,25 @@
+# The Docker image that will be used to build your app
+image: node:20-alpine3.20
+
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .next/cache
+    
+pages:
+  stage: deploy
+  before_script:
+  - yarn install
+  - yarn build
+  - find public -mindepth 1 -maxdepth 1 -type d | xargs rm -rf
+  - find public -type f -name "*.html" | xargs rm -rf
+
+  script:
+    - mv -f out/* public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
